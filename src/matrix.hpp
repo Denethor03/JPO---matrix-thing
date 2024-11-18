@@ -118,5 +118,53 @@ namespace ms{
                     }
                 return Matrix(temp_vector);
             }
+             Matrix& operator*=(const double& other){
+                for(int i {}; i<m_rows; i++){
+                        for(int j {}; j<m_columns; j++){
+                            m_matrix[i][j]*=other;
+                        } 
+                    }
+                return *this;
+            }
+            Matrix operator/(const double& other)const{
+                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
+                for(int i {}; i<m_rows; i++){
+                        for(int j {}; j<m_columns; j++){
+                            temp_vector[i][j] = m_matrix[i][j]/other;
+                        } 
+                    }
+                return Matrix(temp_vector);
+            }
+            Matrix operator/=(const double& other){
+                for(int i {}; i<m_rows; i++){
+                        for(int j {}; j<m_columns; j++){
+                            m_matrix[i][j]/=other;
+                        } 
+                    }
+                return *this;
+            }
+            friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix){
+                for(int i {}; i<matrix.m_rows; i++){
+                    for(int j {}; j<matrix.m_columns; j++){
+                        os<<matrix.m_matrix[i][j]<<" ";
+                    }
+                    os<<std::endl;
+                }
+                return os;
+            }
+            friend Matrix operator*(const double& scalar, const Matrix& matrix);
+            
     };
+
+    Matrix operator*(const double& scalar, const Matrix& matrix){
+        std::vector<std::vector<double>> temp_vector(matrix.m_rows,std::vector<double>(matrix.m_columns));
+        for(int i {}; i<matrix.m_rows; i++){
+            for(int j {}; j<matrix.m_columns; j++){
+                temp_vector[i][j] = matrix.m_matrix[i][j]*scalar;
+            } 
+        }
+        return Matrix(temp_vector);
+    }
+
+
 }

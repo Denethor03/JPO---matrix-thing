@@ -22,6 +22,6 @@ int main(){
         {2,3,4},
         {1,2,3}
     });
-    m2 = m2*2;
-    m2.printMatrix();
+    m2/=2;
+    cout<<m2;
 }
