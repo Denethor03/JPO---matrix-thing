@@ -6,23 +6,44 @@
 namespace ms{
     class Matrix{
         private:
-            std::vector<std::vector<double>> m_matrix;
-            int m_rows = m_matrix.size();
-            int m_columns = m_matrix[0].size();
+            std::vector<std::vector<double>> m_matrix{};
+            int m_rows = 0;
+            int m_columns = 0;
+            
             void updateDimensions(){
                 m_rows = m_matrix.size();
                 m_columns = m_matrix[0].size();
             }
         public:
-            Matrix(int r, int c) : m_matrix(r,std::vector<double>(c)){}
-            Matrix(int r, int c, double val) : m_matrix(r,std::vector<double>(c,val)){}
-            Matrix(std::initializer_list<std::vector<double>> matrix) : m_matrix(matrix){}
-            Matrix(std::vector<std::vector<double>> matrix) : m_matrix(matrix){}
+            Matrix(const int& r,const int& c) : m_matrix(r,std::vector<double>(c)) {
+                if(r <= 0 || c <= 0){ 
+                    throw std::invalid_argument("Matrix dimensions cannot be less than 0");
+                }else{
+                    updateDimensions();
+                }
+            }
+            Matrix(const int& r,const int& c,const double& val): m_matrix(r,std::vector<double>(c,val)){
+                if(r <= 0 || c <= 0){ 
+                    throw std::invalid_argument("Matrix dimensions cannot be less than 0");
+                }else{
+                    updateDimensions();
+                }
+            }
+            Matrix(const std::vector<std::vector<double>>& matrix) : m_matrix(matrix){
+                std::cout<<"Test";
+                int t_len = matrix[0].size();
+                for(int i{}; i<matrix.size(); i++){
+                    if(t_len != matrix[i].size()){
+                        throw std::invalid_argument("Matrix is not a rectangle uhh idk");
+                    }
+                }
+                updateDimensions();
+            }
             
-            double getVal(int r, int c)const{
+            double getVal(const int& r,const int& c)const{
                 return m_matrix[r][c];
             }
-            void setVal(int r, int c, double val){
+            void setVal(const int& r,const int& c,const double& val){
                 m_matrix[r][c] = val;
             }
             double getRows()const{
@@ -52,7 +73,7 @@ namespace ms{
             Matrix operator+(const Matrix& other)const{
                 std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
-                   std::cout<<"Cannot add matrices: dimensions don't match\n";
+                   throw std::invalid_argument("Cannot add matrices: dimensions don't match");
                 }
                 else{
                     
@@ -68,7 +89,7 @@ namespace ms{
             Matrix& operator+=(const Matrix& other){
                 std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
-                   std::cout<<"Cannot add matrices: dimensions don't match\n";
+                   throw std::invalid_argument("Cannot add matrices: dimensions don't match\n");
                 }
                 else{
                     
@@ -84,7 +105,7 @@ namespace ms{
              Matrix operator-(const Matrix& other)const{
                 std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
-                   std::cout<<"Cannot add matrices: dimensions don't match\n";
+                   throw std::invalid_argument("Cannot add matrices: dimensions don't match");
                 }
                 else{
                     
@@ -100,7 +121,7 @@ namespace ms{
             Matrix& operator-=(const Matrix& other){
                 std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
-                   std::cout<<"Cannot add matrices: dimensions don't match\n";
+                   throw std::invalid_argument("Cannot add matrices: dimensions don't match\n");
                 }
                 else{
                     
@@ -185,7 +206,7 @@ namespace ms{
 
             void addColumn(const std::vector<double>& vec){
                 if(vec.size()!=m_rows){
-                    std::cout<<"Cannod add column: wrong size\n";
+                    throw std::invalid_argument("Cannot add column: wrong size");
                 }else{
                     for(int i{}; i<m_rows; i++){
                         m_matrix[i].push_back(vec[i]);
@@ -197,7 +218,7 @@ namespace ms{
             Matrix operator*(const Matrix& other){
                 std::vector<std::vector<double>> result(m_rows,std::vector<double>(other.m_columns));
                 if(m_columns!=other.m_rows){
-                    std::cout<<"Cannot multiply matrices: number of columns must be equal to number of rows\n";
+                     throw std::invalid_argument("Cannot multiply matrices: number of columns must be equal to number of rows.");
                 }else{
                    
                     for(int i{}; i<m_rows;i++){
@@ -226,7 +247,7 @@ namespace ms{
 
     class IdentityMatrix : public Matrix{
         public:
-            IdentityMatrix(int size) : Matrix(size,size){
+            IdentityMatrix(const int& size) : Matrix(size,size){
                 for(int i{}; i<size; i++){
                     setVal(i,i,1);
                 }
