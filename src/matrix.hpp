@@ -7,8 +7,8 @@ namespace ms{
     class Matrix{
         private:
             std::vector<std::vector<double>> m_matrix{};
-            int m_rows = 0;
-            int m_columns = 0;
+            int m_rows {0};
+            int m_columns {0};
             
             void updateDimensions(){
                 m_rows = m_matrix.size();
@@ -18,19 +18,18 @@ namespace ms{
             Matrix(const int& r,const int& c) : m_matrix(r,std::vector<double>(c)) {
                 if(r <= 0 || c <= 0){ 
                     throw std::invalid_argument("Matrix dimensions cannot be less than 0");
-                }else{
-                    updateDimensions();
                 }
+                updateDimensions();
             }
             Matrix(const int& r,const int& c,const double& val): m_matrix(r,std::vector<double>(c,val)){
                 if(r <= 0 || c <= 0){ 
                     throw std::invalid_argument("Matrix dimensions cannot be less than 0");
-                }else{
-                    updateDimensions();
                 }
+                updateDimensions();
+    
             }
             Matrix(const std::vector<std::vector<double>>& matrix) : m_matrix(matrix){
-                std::cout<<"Test";
+               // std::cout<<"Test";
                 int t_len = matrix[0].size();
                 for(int i{}; i<matrix.size(); i++){
                     if(t_len != matrix[i].size()){
@@ -200,9 +199,7 @@ namespace ms{
                 return os;
             }
 
-            friend Matrix operator*(const double& scalar, const Matrix& matrix);
-
-            
+                  
 
             void addColumn(const std::vector<double>& vec){
                 if(vec.size()!=m_rows){
@@ -232,7 +229,8 @@ namespace ms{
                 return Matrix(result);
             }
 
-            
+            friend double det(const Matrix& matrix);
+            friend Matrix operator*(const double& scalar, const Matrix& matrix);
     };
 
     Matrix operator*(const double& scalar, const Matrix& matrix){
@@ -253,4 +251,36 @@ namespace ms{
                 }
             }
     };
+    
+    double det(const Matrix& matrix){
+        if(matrix.m_rows!=matrix.m_columns){
+            throw std::invalid_argument("Cannot calculate determinant: matrix dimensions are not equal");
+        }else
+        if(matrix.m_rows==1){
+            return matrix.m_matrix[0][0];
+        }else
+        if(matrix.m_rows==2){
+            return matrix.m_matrix[0][0]*matrix.m_matrix[1][1]-matrix.m_matrix[0][1]*matrix.m_matrix[1][0];
+        }else{
+            double determinant {0};
+            for(int i {}; i<matrix.m_columns; i++){
+                std::vector<std::vector<double>> temp (matrix.m_rows-1,std::vector<double>(matrix.m_rows-1));   
+                for(int row {1};row<matrix.m_columns; row++){
+                    int column {0};
+                    for(int col{0}; col< matrix.m_columns; col++){
+                        if(col==i){
+                            continue;
+                        }
+                        temp[row-1][column] = matrix.m_matrix[row][col];
+                        column++;
+
+                    }
+                }
+                Matrix subMatrix(temp);
+                determinant += (i%2==0 ? 1 : -1)*matrix.m_matrix[0][i]*det(subMatrix);
+            }
+            return determinant;
+        }
+        
+    }
 }

@@ -1,24 +1,22 @@
 #include <iostream>
 #include "../src/matrix.hpp"
-using std::cout;
-using std::cin;
-using std::endl;
-using ms::Matrix;
-using std::vector;
+
+using namespace std;
+using namespace ms;
+
 
 int main(){
     Matrix m1({                //m2({{},{},{}...}) or without ()
-        {2,3,4,5},
-        {1,2,3,5},
-        {3,2,1,5},
-        {2,3,1,5}
+      {1,3,4,1},
+      {3,4,1,2},
+      {9,1,3,5},
+      {2,3,1,6}
     });
     vector<vector<double>> vec = {                
-        {2,3,1},
         {1,2,3},
-        {3,2,4}
+        {4,5,6},
+        {7,8,9}
     };
-    Matrix m2(vec);
-   
-   cout<<m1;  
+    Matrix m3(vec);
+    cout<<det(m1)<<endl;
 }
