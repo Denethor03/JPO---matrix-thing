@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include <initializer_list>
 #include "../lib/complex.hpp"
 #include <iostream>
+
 namespace ms{
     class Matrix{
         private:
@@ -227,6 +227,22 @@ namespace ms{
                    } 
                 }
                 return Matrix(result);
+            }
+            Matrix& operator*=(const Matrix& other){
+                std::vector<std::vector<double>> result(m_rows,std::vector<double>(other.m_columns));
+                if(m_columns!=other.m_rows){
+                     throw std::invalid_argument("Cannot multiply matrices: number of columns must be equal to number of rows.");
+                }else{           
+                    for(int i{}; i<m_rows;i++){
+                        for(int j{};j<m_columns;j++){
+                            for(int k{};k<m_columns;k++){
+                                result[i][j] += m_matrix[i][k]*other.m_matrix[k][j];
+                            }
+                        }
+                   }
+                   m_matrix = result;
+                   return *this; 
+                }
             }
 
             friend double det(const Matrix& matrix);
