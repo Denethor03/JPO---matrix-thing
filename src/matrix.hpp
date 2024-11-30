@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "../lib/complex.hpp"
-#include <iostream>
+#include <iostream>//l
 
 namespace ms{
     class Matrix{
@@ -42,15 +42,22 @@ namespace ms{
             double getVal(const int& r,const int& c)const{
                 return m_matrix[r][c];
             }
+            
             void setVal(const int& r,const int& c,const double& val){
                 m_matrix[r][c] = val;
             }
+
             double getRows()const{
                 return m_rows;
             }
+            const std::vector<std::vector<double>>& getMatrix()const{
+                return m_matrix; 
+            }
+
             double getColumns()const{
                 return m_columns;
             }
+
             void printMatrix()const{
                 for(int i {}; i<m_rows; i++){
                     for(int j {}; j<m_columns; j++){
@@ -59,6 +66,7 @@ namespace ms{
                     std::cout<<"\n";
                 }
             }
+
             void addRow(const std::vector<double>& vec){
                 if(vec.size()!=m_columns){
                     std::cout<<"Cannot add row: wrong size\n";
@@ -69,8 +77,49 @@ namespace ms{
                     
                 }
             }
+
+            void addColumn(const std::vector<double>& vec){
+                if(vec.size()!=m_rows){
+                    throw std::invalid_argument("Cannot add column: wrong size");
+                }else{
+                    for(int i{}; i<m_rows; i++){
+                        m_matrix[i].push_back(vec[i]);
+                    }
+                }
+                updateDimensions();
+            }
+
+            double det(){
+                if(m_rows!=m_columns){
+                    throw std::invalid_argument("Cannot calculate determinant: matrix dimensions are not equal");
+                }else
+                if(m_rows==1){
+                    return m_matrix[0][0];
+                }else
+                if(m_rows==2){
+                    return m_matrix[0][0]*m_matrix[1][1]-m_matrix[0][1]*m_matrix[1][0];
+                }else{
+                    double determinant {0};
+                    for(int i {}; i<m_columns; i++){
+                        Matrix temp(m_rows-1,m_rows-1);   
+                        for(int row {1};row<m_columns; row++){
+                            int column {0};
+                            for(int col{0}; col< m_columns; col++){
+                                if(col==i){
+                                    continue;
+                                }
+                                temp[row-1][column] = m_matrix[row][col];
+                                column++;
+
+                            }
+                        }
+                        determinant += (i%2==0 ? 1 : -1)*m_matrix[0][i]*temp.det();
+                    }
+                    return determinant;
+                }
+            }
             Matrix operator+(const Matrix& other)const{
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
+                Matrix temp_matrix(m_rows,m_columns);
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
                    throw std::invalid_argument("Cannot add matrices: dimensions don't match");
                 }
@@ -78,15 +127,14 @@ namespace ms{
                     
                     for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            temp_vector[i][j] = m_matrix[i][j] + other.m_matrix[i][j];
+                            temp_matrix[i][j] = m_matrix[i][j] + other[i][j];
                         } 
                     } 
                 }
-                return Matrix(temp_vector);
+                return temp_matrix;
             }
 
             Matrix& operator+=(const Matrix& other){
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
                    throw std::invalid_argument("Cannot add matrices: dimensions don't match\n");
                 }
@@ -94,7 +142,7 @@ namespace ms{
                     
                     for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            m_matrix[i][j] += other.m_matrix[i][j];
+                            m_matrix[i][j] += other[i][j];
                         } 
                     } 
                 }
@@ -102,7 +150,7 @@ namespace ms{
             }
 
              Matrix operator-(const Matrix& other)const{
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
+                Matrix temp_matrix(m_rows,m_columns);
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
                    throw std::invalid_argument("Cannot add matrices: dimensions don't match");
                 }
@@ -110,15 +158,14 @@ namespace ms{
                     
                     for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            temp_vector[i][j] = m_matrix[i][j] - other.m_matrix[i][j];
+                            temp_matrix[i][j] = m_matrix[i][j] - other[i][j];
                         } 
                     } 
                 }
-                return Matrix(temp_vector);
+                return temp_matrix;
             }
 
             Matrix& operator-=(const Matrix& other){
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
                    throw std::invalid_argument("Cannot add matrices: dimensions don't match\n");
                 }
@@ -126,7 +173,7 @@ namespace ms{
                     
                     for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            m_matrix[i][j] -= other.m_matrix[i][j];
+                            m_matrix[i][j] -= other[i][j];
                         } 
                     } 
                 }
@@ -139,7 +186,7 @@ namespace ms{
                 }
                 for(int i {}; i<m_rows; i++){
                     for(int j {}; j<m_columns; j++){
-                        if(m_matrix[i][j] != other.m_matrix[i][j]){ 
+                        if(m_matrix[i][j] != other[i][j]){ 
                             return false;
                         }       
                     } 
@@ -152,13 +199,13 @@ namespace ms{
             }
 
             Matrix operator*(const double& other)const{
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
+                Matrix temp_matrix(m_rows,m_columns);
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            temp_vector[i][j] = m_matrix[i][j]*other;
+                            temp_matrix[i][j] = m_matrix[i][j]*other;
                         } 
                     }
-                return Matrix(temp_vector);
+                return temp_matrix;
             }
 
              Matrix& operator*=(const double& other){
@@ -171,13 +218,13 @@ namespace ms{
             }
 
             Matrix operator/(const double& other)const{
-                std::vector<std::vector<double>> temp_vector(m_rows,std::vector<double>(m_columns));
+                Matrix temp_matrix(m_rows,m_columns);
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
-                            temp_vector[i][j] = m_matrix[i][j]/other;
+                            temp_matrix[i][j] = m_matrix[i][j]/other;
                         } 
                     }
-                return Matrix(temp_vector);
+                return temp_matrix;
             }
 
             Matrix operator/=(const double& other){
@@ -192,28 +239,15 @@ namespace ms{
             friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix){
                 for(int i {}; i<matrix.m_rows; i++){
                     for(int j {}; j<matrix.m_columns; j++){
-                        os<<matrix.m_matrix[i][j]<<" ";
+                        os<<matrix[i][j]<<" ";
                     }
                     os<<std::endl;
                 }
                 return os;
             }
 
-                  
-
-            void addColumn(const std::vector<double>& vec){
-                if(vec.size()!=m_rows){
-                    throw std::invalid_argument("Cannot add column: wrong size");
-                }else{
-                    for(int i{}; i<m_rows; i++){
-                        m_matrix[i].push_back(vec[i]);
-                    }
-                }
-                updateDimensions();
-            }
-
-            Matrix operator*(const Matrix& other){
-                std::vector<std::vector<double>> result(m_rows,std::vector<double>(other.m_columns));
+            Matrix operator*(const Matrix& other)const{
+                Matrix result(m_rows,other.m_columns);
                 if(m_columns!=other.m_rows){
                      throw std::invalid_argument("Cannot multiply matrices: number of columns must be equal to number of rows.");
                 }else{
@@ -221,82 +255,104 @@ namespace ms{
                     for(int i{}; i<m_rows;i++){
                         for(int j{};j<m_columns;j++){
                             for(int k{};k<m_columns;k++){
-                                result[i][j] += m_matrix[i][k]*other.m_matrix[k][j];
+                                result[i][j] += m_matrix[i][k]*other[k][j];
                             }
                         }
                    } 
                 }
-                return Matrix(result);
+                return result;
             }
             Matrix& operator*=(const Matrix& other){
-                std::vector<std::vector<double>> result(m_rows,std::vector<double>(other.m_columns));
+                Matrix result(m_rows,other.m_columns);
                 if(m_columns!=other.m_rows){
                      throw std::invalid_argument("Cannot multiply matrices: number of columns must be equal to number of rows.");
                 }else{           
                     for(int i{}; i<m_rows;i++){
                         for(int j{};j<m_columns;j++){
                             for(int k{};k<m_columns;k++){
-                                result[i][j] += m_matrix[i][k]*other.m_matrix[k][j];
+                                result[i][j] += m_matrix[i][k]*other[k][j];
                             }
                         }
                    }
-                   m_matrix = result;
+                   *this = result;
                    return *this; 
                 }
             }
 
-            friend double det(const Matrix& matrix);
+            std::vector<double>& operator[](const int& index){
+                if(index <0 || index >= m_rows){
+                    throw std::invalid_argument("Index out of bounds");
+                }
+                return m_matrix[index];
+            }
+            const std::vector<double>& operator[](const int& index)const{  //makes using [] on other possible
+                if(index <0 || index >= m_rows){
+                    throw std::invalid_argument("Index out of bounds");
+                }
+                return m_matrix[index];
+            }
+           
             friend Matrix operator*(const double& scalar, const Matrix& matrix);
     };
 
     Matrix operator*(const double& scalar, const Matrix& matrix){
-        std::vector<std::vector<double>> temp_vector(matrix.m_rows,std::vector<double>(matrix.m_columns));
+        Matrix temp_matrix = matrix;
         for(int i {}; i<matrix.m_rows; i++){
             for(int j {}; j<matrix.m_columns; j++){
-                temp_vector[i][j] = matrix.m_matrix[i][j]*scalar;
+                temp_matrix[i][j] = matrix.m_matrix[i][j]*scalar;
             } 
         }
-        return Matrix(temp_vector);
+        return temp_matrix;
+    }
+    std::ostream& operator<<(std::ostream& os, const std::vector<double>& vec){
+        for(int i {}; i<vec.size(); i++){
+                    
+                os<<vec[i]<<" ";
+            }
+            os<<std::endl;
+                
+        return os;
     }
 
-    class IdentityMatrix : public Matrix{
+    class SquareMatrix : public Matrix{
+        private:
+            using Matrix::addColumn;
+            using Matrix::addRow;
         public:
-            IdentityMatrix(const int& size) : Matrix(size,size){
+            SquareMatrix(const int& size) : Matrix(size,size){}
+            SquareMatrix(const int& size,const int& value) : Matrix(size,size,value){}
+            SquareMatrix(const std::vector<std::vector<double>>& matrix): Matrix(matrix){
+                if(matrix.size()!=matrix[0].size()){
+                    throw std::invalid_argument("Matrix dimensions don't match");
+                }
+            }
+    };
+    class IdentityMatrix : public SquareMatrix{
+        private:
+            using Matrix::setVal;
+            using Matrix::operator*=;
+            using Matrix::operator*;
+            using Matrix::operator+;
+            using Matrix::operator+=;
+            using Matrix::operator-;
+            using Matrix::operator-=;
+            using Matrix::operator/;
+            using Matrix::operator/=;
+        public:
+            IdentityMatrix(const int& size) : SquareMatrix(size){
                 for(int i{}; i<size; i++){
                     setVal(i,i,1);
                 }
             }
-    };
-    
-    double det(const Matrix& matrix){
-        if(matrix.m_rows!=matrix.m_columns){
-            throw std::invalid_argument("Cannot calculate determinant: matrix dimensions are not equal");
-        }else
-        if(matrix.m_rows==1){
-            return matrix.m_matrix[0][0];
-        }else
-        if(matrix.m_rows==2){
-            return matrix.m_matrix[0][0]*matrix.m_matrix[1][1]-matrix.m_matrix[0][1]*matrix.m_matrix[1][0];
-        }else{
-            double determinant {0};
-            for(int i {}; i<matrix.m_columns; i++){
-                std::vector<std::vector<double>> temp (matrix.m_rows-1,std::vector<double>(matrix.m_rows-1));   
-                for(int row {1};row<matrix.m_columns; row++){
-                    int column {0};
-                    for(int col{0}; col< matrix.m_columns; col++){
-                        if(col==i){
-                            continue;
-                        }
-                        temp[row-1][column] = matrix.m_matrix[row][col];
-                        column++;
-
-                    }
+            const std::vector<double>& operator[](const int& index)const{
+                if(index <0 || index >= getRows()){
+                    throw std::invalid_argument("Index out of bounds");
                 }
-                Matrix subMatrix(temp);
-                determinant += (i%2==0 ? 1 : -1)*matrix.m_matrix[0][i]*det(subMatrix);
+                return getMatrix()[index];
             }
-            return determinant;
-        }
-        
-    }
+            
+    };
+
+    
 }
+

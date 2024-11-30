@@ -12,10 +12,11 @@ int main(){
       {9,1,3}
     });
     vector<vector<double>> vec = {                
-        {1,2,3},
-        {4,5,6},
-        {7,8,9}
+      {1,2,3},
+      {4,5,2},
+      {7,8,9}
     };
-    Matrix m2(vec);
-    cout<<(m1*=m2);
+    Matrix s1(vec);
+    cout<<s1.det();
+  
 }
