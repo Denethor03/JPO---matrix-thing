@@ -56,6 +56,9 @@ namespace ms{
                     m_imag = imag;
                     return *this;
                 }
+                
+                template <typename U>
+                friend ComplexNumber<U> operator*(const U&, const ComplexNumber<U>& complexNumber);
 
                 friend std::ostream& operator<<(std::ostream& os, const ComplexNumber& c){
                     os << c.m_real << (c.m_imag >= 0 ? "+" : "-")<<std::abs(c.m_imag)<<"i";
@@ -95,4 +98,9 @@ namespace ms{
                 }
 
         };
+
+        template <typename T>
+        ComplexNumber<T> operator*(const T& scalar, const ComplexNumber<T>& complexNumber){
+            return ComplexNumber<T>(complexNumber.getReal()*scalar,complexNumber.getImag()*scalar);
+        }
 }

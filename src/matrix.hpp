@@ -1,12 +1,14 @@
 #pragma once
 #include <vector>
 #include "../lib/complex.hpp"
-#include <iostream>//l
+#include <iostream>
+
 
 namespace ms{
+    template <typename T>
     class Matrix{
         private:
-            std::vector<std::vector<double>> m_matrix{};
+            std::vector<std::vector<T>> m_matrix{};
             int m_rows {0};
             int m_columns {0};
             
@@ -14,21 +16,25 @@ namespace ms{
                 m_rows = m_matrix.size();
                 m_columns = m_matrix[0].size();
             }
+        protected:
+            const std::vector<std::vector<T>>& getMatrix()const{
+                return m_matrix; 
+            }
         public:
-            Matrix(const int& r,const int& c) : m_matrix(r,std::vector<double>(c)) {
+            Matrix(const int& r,const int& c) : m_matrix(r,std::vector<T>(c)) {
                 if(r <= 0 || c <= 0){ 
                     throw std::invalid_argument("Matrix dimensions cannot be less than 0");
                 }
                 updateDimensions();
             }
-            Matrix(const int& r,const int& c,const double& val): m_matrix(r,std::vector<double>(c,val)){
+            Matrix(const int& r,const int& c,const T& val): m_matrix(r,std::vector<T>(c,val)){
                 if(r <= 0 || c <= 0){ 
                     throw std::invalid_argument("Matrix dimensions cannot be less than 0");
                 }
                 updateDimensions();
     
             }
-            Matrix(const std::vector<std::vector<double>>& matrix) : m_matrix(matrix){
+            Matrix(const std::vector<std::vector<T>>& matrix) : m_matrix(matrix){
                // std::cout<<"Test";
                 int t_len = matrix[0].size();
                 for(int i{}; i<matrix.size(); i++){
@@ -39,22 +45,20 @@ namespace ms{
                 updateDimensions();
             }
             
-            double getVal(const int& r,const int& c)const{
+            T getVal(const int& r,const int& c)const{
                 return m_matrix[r][c];
             }
             
-            void setVal(const int& r,const int& c,const double& val){
+            void setVal(const int& r,const int& c,const T& val){
                 m_matrix[r][c] = val;
             }
 
-            double getRows()const{
+            int getRows()const{
                 return m_rows;
             }
-            const std::vector<std::vector<double>>& getMatrix()const{
-                return m_matrix; 
-            }
+            
 
-            double getColumns()const{
+            int getColumns()const{
                 return m_columns;
             }
 
@@ -67,7 +71,7 @@ namespace ms{
                 }
             }
 
-            void addRow(const std::vector<double>& vec){
+            void addRow(const std::vector<T>& vec){
                 if(vec.size()!=m_columns){
                     std::cout<<"Cannot add row: wrong size\n";
                 }
@@ -78,7 +82,7 @@ namespace ms{
                 }
             }
 
-            void addColumn(const std::vector<double>& vec){
+            void addColumn(const std::vector<T>& vec){
                 if(vec.size()!=m_rows){
                     throw std::invalid_argument("Cannot add column: wrong size");
                 }else{
@@ -89,7 +93,7 @@ namespace ms{
                 updateDimensions();
             }
 
-            double det(){
+            T det(){
                 if(m_rows!=m_columns){
                     throw std::invalid_argument("Cannot calculate determinant: matrix dimensions are not equal");
                 }else
@@ -99,7 +103,7 @@ namespace ms{
                 if(m_rows==2){
                     return m_matrix[0][0]*m_matrix[1][1]-m_matrix[0][1]*m_matrix[1][0];
                 }else{
-                    double determinant {0};
+                    T determinant {0};
                     for(int i {}; i<m_columns; i++){
                         Matrix temp(m_rows-1,m_rows-1);   
                         for(int row {1};row<m_columns; row++){
@@ -113,7 +117,8 @@ namespace ms{
 
                             }
                         }
-                        determinant += (i%2==0 ? 1 : -1)*m_matrix[0][i]*temp.det();
+                        
+                        determinant += (i%2==0 ? T(1) : T(-1))*m_matrix[0][i]*temp.det();
                     }
                     return determinant;
                 }
@@ -198,7 +203,7 @@ namespace ms{
                 return !operator==(other);
             }
 
-            Matrix operator*(const double& other)const{
+            Matrix operator*(const T& other)const{
                 Matrix temp_matrix(m_rows,m_columns);
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
@@ -208,7 +213,7 @@ namespace ms{
                 return temp_matrix;
             }
 
-             Matrix& operator*=(const double& other){
+             Matrix& operator*=(const T& other){
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
                             m_matrix[i][j]*=other;
@@ -217,7 +222,7 @@ namespace ms{
                 return *this;
             }
 
-            Matrix operator/(const double& other)const{
+            Matrix operator/(const T& other)const{
                 Matrix temp_matrix(m_rows,m_columns);
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
@@ -227,7 +232,7 @@ namespace ms{
                 return temp_matrix;
             }
 
-            Matrix operator/=(const double& other){
+            Matrix operator/=(const T& other){
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
                             m_matrix[i][j]/=other;
@@ -279,32 +284,35 @@ namespace ms{
                 }
             }
 
-            std::vector<double>& operator[](const int& index){
+            std::vector<T>& operator[](const int& index){
                 if(index <0 || index >= m_rows){
                     throw std::invalid_argument("Index out of bounds");
                 }
                 return m_matrix[index];
             }
-            const std::vector<double>& operator[](const int& index)const{  //makes using [] on other possible
+            const std::vector<T>& operator[](const int& index)const{  //makes using [] on other possible
                 if(index <0 || index >= m_rows){
                     throw std::invalid_argument("Index out of bounds");
                 }
                 return m_matrix[index];
             }
-           
-            friend Matrix operator*(const double& scalar, const Matrix& matrix);
+            template <typename U>
+            friend Matrix<U> operator*(const U& scalar, const Matrix<U>& matrix);
     };
-
-    Matrix operator*(const double& scalar, const Matrix& matrix){
-        Matrix temp_matrix = matrix;
+    
+    template <typename T>
+    Matrix<T> operator*(const T& scalar, const Matrix<T>& matrix){
+        Matrix<T> temp_matrix = matrix;
         for(int i {}; i<matrix.m_rows; i++){
             for(int j {}; j<matrix.m_columns; j++){
-                temp_matrix[i][j] = matrix.m_matrix[i][j]*scalar;
+                temp_matrix[i][j] = matrix[i][j]*scalar;
             } 
         }
         return temp_matrix;
     }
-    std::ostream& operator<<(std::ostream& os, const std::vector<double>& vec){
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec){
         for(int i {}; i<vec.size(); i++){
                     
                 os<<vec[i]<<" ";
@@ -313,42 +321,43 @@ namespace ms{
                 
         return os;
     }
-
-    class SquareMatrix : public Matrix{
+    template <typename T>
+    class SquareMatrix : public Matrix<T>{
         private:
-            using Matrix::addColumn;
-            using Matrix::addRow;
+            using Matrix<T>::addColumn;
+            using Matrix<T>::addRow;
         public:
-            SquareMatrix(const int& size) : Matrix(size,size){}
-            SquareMatrix(const int& size,const int& value) : Matrix(size,size,value){}
-            SquareMatrix(const std::vector<std::vector<double>>& matrix): Matrix(matrix){
+            SquareMatrix(const int& size) : Matrix<T>(size,size){}
+            SquareMatrix(const int& size,const int& value) : Matrix<T>(size,size,value){}
+            SquareMatrix(const std::vector<std::vector<T>>& matrix): Matrix<T>(matrix){
                 if(matrix.size()!=matrix[0].size()){
                     throw std::invalid_argument("Matrix dimensions don't match");
                 }
             }
     };
-    class IdentityMatrix : public SquareMatrix{
+    template <typename T>
+    class IdentityMatrix : public SquareMatrix<T>{
         private:
-            using Matrix::setVal;
-            using Matrix::operator*=;
-            using Matrix::operator*;
-            using Matrix::operator+;
-            using Matrix::operator+=;
-            using Matrix::operator-;
-            using Matrix::operator-=;
-            using Matrix::operator/;
-            using Matrix::operator/=;
+            using Matrix<T>::setVal;
+            using Matrix<T>::operator*=;
+            using Matrix<T>::operator*;
+            using Matrix<T>::operator+;
+            using Matrix<T>::operator+=;
+            using Matrix<T>::operator-;
+            using Matrix<T>::operator-=;
+            using Matrix<T>::operator/;
+            using Matrix<T>::operator/=;
         public:
-            IdentityMatrix(const int& size) : SquareMatrix(size){
+            IdentityMatrix(const int& size) : SquareMatrix<T>(size){
                 for(int i{}; i<size; i++){
                     setVal(i,i,1);
                 }
             }
-            const std::vector<double>& operator[](const int& index)const{
-                if(index <0 || index >= getRows()){
+            const std::vector<T>& operator[](const int& index)const{
+                if(index <0 || index >= this->getRows()){  // "->" used bcs something something templates
                     throw std::invalid_argument("Index out of bounds");
                 }
-                return getMatrix()[index];
+                return this->getMatrix()[index];
             }
             
     };

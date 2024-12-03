@@ -6,17 +6,12 @@ using namespace ms;
 
 
 int main(){
-    Matrix m1({                //m2({{},{},{}...}) or without ()
-      {1,3,4},
-      {3,4,1},
-      {9,1,3}
+    Matrix<double> m1({
+      {2,3,4},
+      {1,3,2},
+      {1,1,1}
     });
-    vector<vector<double>> vec = {                
-      {1,2,3},
-      {4,5,2},
-      {7,8,9}
-    };
-    Matrix s1(vec);
-    cout<<s1.det();
-  
+    m1.addRow({1,3,4});
+    IdentityMatrix<double> i1(3);
+    cout<<i1;
 }
