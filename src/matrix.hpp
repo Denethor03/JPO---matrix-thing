@@ -123,6 +123,18 @@ namespace ms{
                     return determinant;
                 }
             }
+
+            Matrix& transpose(void){
+                Matrix temp(m_columns,m_rows);
+                for(int i{}; i<m_rows; i++){
+                    for(int j{}; j<m_columns; j++){
+                        temp[j][i] = m_matrix[i][j];
+                    }
+                }
+                *this = temp;
+                updateDimensions();
+                return *this;
+            }
             Matrix operator+(const Matrix& other)const{
                 Matrix temp_matrix(m_rows,m_columns);
                 if(m_columns != other.m_columns || m_rows != other.m_rows){
