@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../include/matrix.hpp"
+#include <cstdlib>
 
 using std::cout;
 using std::cin;
@@ -12,7 +13,6 @@ int main(){
     cout<<"1. By creating matrix with specific dimensions: Matrix<double> m1(3,3); \n";
     Matrix<double> m1(3,3);
     cout<<m1;
-    
     cout<<"2. The same way, but with specific value: Matrix<double> m2(3,3,2.5);\n";
     Matrix<double> m2(3,3,2.5);
     cout<<m2;
@@ -20,6 +20,7 @@ int main(){
     cout<<"In that case, every row must have the same length\n";
     Matrix<double> m3({{1,2,3},{4,5,6},{7,8,9}});
     cout<<m3;
+    cout<<"All matrices can be displayed using \"cout<<\"\n";
     cout<<"[Enter to continue]";
     cin.get();
     cout<<"============================================================================\n";
@@ -33,7 +34,7 @@ int main(){
     cout<<"[Enter to continue]";
     cin.get();
     cout<<"============================================================================\n";
-    cout<<"Every basic operation is supported (+,-,*,/ and =+,... counterparts)\n";
+    cout<<"Every basic operation is supported (+,-,*,/ and = counterparts)\n";
     cout<<"Examples shown on m2 and m3 (excluding division)\n";
     cout<<"1. Addition:\n";
     cout<<(m2+m3);
@@ -75,4 +76,35 @@ int main(){
     cout<<"After m3.transpose():\n";
     m3.transpose();
     cout<<m3;
+    cout<<"[Enter to continue]";
+    cin.get();
+    cout<<"============================================================================\n";
+    cout<<"Matrices can be of different types (int, float, etc., previously used double as example)\n";
+    cout<<"They also accept ComplexNumber as type: Matrix<ComplexNumber> c1(3,3,complex1):\n";
+    ComplexNumber<double> complex1(1,2);
+    Matrix<ComplexNumber<double>> c1(3,3,complex1);
+    cout<<c1;
+    cout<<"Every operation described earlier work on that type, eg. multiplication (c1*c1):\n";
+    cout<<(c1*c1);
+    cout<<"or determinant (in that case 0):\n";
+    cout<<c1.det()<<"\n";
+    cout<<"Matrix of chars is also possible (for whatever reason you need that)\n";
+    Matrix<char> ch1(3,3,'b');
+    cout<<ch1;
+    cout<<"[Enter to continue]";
+    cin.get();
+    cout<<"============================================================================\n";
+    cout<<"There's also SquareMatrix and IdentityMatrix. They work very similiar to Matrix, but have some restrictions.\n";
+    cout<<"SquareMatrix has every previous operation exept the ones that modify its dimensions\n";
+    cout<<"IdentityMatrix cannot be modified, only used in different operations\n";
+    IdentityMatrix<double> i1(4);
+    cout<<"IdentityMatrix<double i1(4):\n";
+    SquareMatrix<double> s1({{2,1,3},{4,2,1},{6,2,1}});
+    cout<<i1;
+    cout<<"SquareMatrix<double> s1({{2,1,3},{4,2,1},{6,2,1}}):\n";
+    cout<<s1<<"\n";
+    cout<<"There are more \"manual\" functions to get specific values, dimensions or to print matrix,\n";
+    cout<<"but there's no point in showcasing them since they are used inside class or have alternatives\n";
+
 }
+

@@ -279,6 +279,12 @@ namespace ms{
                 return *this;
             }
 
+            Matrix& operator=(const Matrix& other){
+                    m_matrix = other.m_matrix;
+                    updateDimensions();
+                    return *this;
+            }
+
             friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix){
                 for(int i {}; i<matrix.m_rows; i++){
                     for(int j {}; j<matrix.m_columns; j++){
@@ -374,6 +380,24 @@ namespace ms{
                     throw std::invalid_argument("Matrix dimensions don't match");
                 }
             }
+            SquareMatrix& operator*=(const Matrix<T>& other){
+                SquareMatrix result(this->getRows());
+                if(this->getRows()!=other.getRows()){
+                    throw std::invalid_argument("Cannot multiply matrices: number of columns must be equal to number of rows.");
+                }else if(other.getColumns() != this->getColumns()){
+                    throw std::invalid_argument("Result must be square matrix");
+                }else{           
+                    for(int i{}; i<this->getRows();i++){
+                        for(int j{};j<this->getColumns();j++){
+                            for(int k{};k<this->getColumns();k++){
+                                result[i][j] += this->getMatrix()[i][k]*other[k][j];
+                            }
+                        }
+                   }
+                   *this = result;
+                   return *this; 
+                }
+            }
     };
     template <typename T>
     class IdentityMatrix : public SquareMatrix<T>{
@@ -402,7 +426,6 @@ namespace ms{
             }
             
     };
-
-    
+ 
 }
 
