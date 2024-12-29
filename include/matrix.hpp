@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../lib/complex.hpp"
+#include "complex.hpp"
 #include <iostream>
 
 
@@ -73,12 +73,21 @@ namespace ms{
 
             void addRow(const std::vector<T>& vec){
                 if(vec.size()!=m_columns){
-                    std::cout<<"Cannot add row: wrong size\n";
+                    throw std::invalid_argument("Cannot add row: wrong size");
                 }
                 else{
                     m_matrix.push_back(vec);
                     updateDimensions();
                     
+                }
+            }
+            
+            void remRow(){
+                if(m_rows==1){
+                    throw std::invalid_argument("Cannot remove more rows");
+                }else{
+                    m_matrix.pop_back();
+                    updateDimensions();
                 }
             }
 
@@ -88,6 +97,17 @@ namespace ms{
                 }else{
                     for(int i{}; i<m_rows; i++){
                         m_matrix[i].push_back(vec[i]);
+                    }
+                }
+                updateDimensions();
+            }
+            
+            void remColumn(){
+                if(m_columns == 1){
+                    throw std::invalid_argument("Cannot remove more columns");
+                }else{
+                    for(int i{}; i<m_rows; i++){
+                        m_matrix[i].pop_back();
                     }
                 }
                 updateDimensions();
@@ -235,6 +255,9 @@ namespace ms{
             }
 
             Matrix operator/(const T& other)const{
+                if(other == 0){
+                    throw std::invalid_argument("Cannot divide by 0");
+                }
                 Matrix temp_matrix(m_rows,m_columns);
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
@@ -245,6 +268,9 @@ namespace ms{
             }
 
             Matrix operator/=(const T& other){
+                if(other == 0){
+                    throw std::invalid_argument("Cannot divide by 0");
+                }
                 for(int i {}; i<m_rows; i++){
                         for(int j {}; j<m_columns; j++){
                             m_matrix[i][j]/=other;
@@ -338,6 +364,8 @@ namespace ms{
         private:
             using Matrix<T>::addColumn;
             using Matrix<T>::addRow;
+            using Matrix<T>::remColumn;
+            using Matrix<T>::remRow;
         public:
             SquareMatrix(const int& size) : Matrix<T>(size,size){}
             SquareMatrix(const int& size,const int& value) : Matrix<T>(size,size,value){}
@@ -351,6 +379,7 @@ namespace ms{
     class IdentityMatrix : public SquareMatrix<T>{
         private:
             using Matrix<T>::setVal;
+            using Matrix<T>::transpose;
             using Matrix<T>::operator*=;
             using Matrix<T>::operator*;
             using Matrix<T>::operator+;

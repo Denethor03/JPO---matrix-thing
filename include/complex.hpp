@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <ostream>
 namespace ms{
     
@@ -45,15 +46,19 @@ namespace ms{
                     return *this;
                 }
                 ComplexNumber operator/(const ComplexNumber& other)const{
-                    T real = (m_real*other.m_real+m_imag*other.m_imag)/(other.m_real*other.m_real+other.m_imag*other.m_imag);
-                    T imag = (m_imag*other.m_real-m_real*other.m_imag)/(other.m_real*other.m_real+other.m_imag*other.m_imag);
+                    T real_up = m_real*other.m_real+m_imag*other.m_imag;
+                    T imag_up = m_imag*other.m_real-m_real*other.m_imag;
+                    T both = other.m_real*other.m_real+other.m_imag*other.m_imag;
+                    T real = real_up/both;
+                    T imag = imag_up/both;
                     return ComplexNumber(real,imag);
                 }
                 ComplexNumber& operator/=(const ComplexNumber& other){
-                    T real = (m_real*other.m_real+m_imag*other.m_imag)/(other.m_real*other.m_real+other.m_imag*other.m_imag);
-                    T imag = (m_imag*other.m_real-m_real*other.m_imag)/(other.m_real*other.m_real+other.m_imag*other.m_imag);
-                    m_real = real;
-                    m_imag = imag;
+                    T real_up = m_real*other.m_real+m_imag*other.m_imag;
+                    T imag_up = m_imag*other.m_real-m_real*other.m_imag;
+                    T both = other.m_real*other.m_real+other.m_imag*other.m_imag;
+                    m_real = real_up/both;
+                    m_imag = imag_up/both;
                     return *this;
                 }
                 
