@@ -7,7 +7,7 @@ using std::cin;
 using namespace ms; // <- I hope you'll forgive my sins
 
 
-int main(){
+int main(){ 
     cout<<"============================================================================\n";
     cout<<"Object \"Matrix\" can be initialized in 3 ways:\n";
     cout<<"1. By creating matrix with specific dimensions: Matrix<double> m1(3,3); \n";
